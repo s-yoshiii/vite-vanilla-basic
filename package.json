@@ -9,5 +9,11 @@
   },
   "devDependencies": {
     "vite": "^2.9.2"
+  },
+  "dependencies": {
+    "@vitejs/plugin-legacy": "^1.8.1",
+    "autoprefixer": "^10.4.4",
+    "postcss": "^8.4.12",
+    "sass": "^1.50.1"
   }
 }
