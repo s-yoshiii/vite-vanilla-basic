@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
-import legacy from "@vitejs/plugin-legacy";
-const { resolve } = require("path");
+import glob from "glob";
+import path from "path";
 import viteImagemin from "vite-plugin-imagemin";
 const root = "src";
 export default defineConfig({
@@ -10,14 +10,20 @@ export default defineConfig({
     outDir: "../dist",
     emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, root, "assets/js/main.js"),
-        index: resolve(__dirname, root, "index.html"),
-        page: resolve(__dirname, root, "page/index.html"),
-      },
+      input: Object.fromEntries(
+        glob
+          .sync("**/*.{js,scss}", {
+            ignore: "**/_**/**/*.{js,scss}",
+            cwd: `./src`,
+          })
+          .map((file) => {
+            console.log(file);
+            const { dir, name } = path.parse(file);
+            return [`${dir}/${name}`, path.resolve("src", file)];
+          })
+      ),
       output: {
         assetFileNames: (assetInfo) => {
-          console.log(assetInfo);
           let extType = assetInfo.name.split(".")[1];
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
             extType = "images";
@@ -31,16 +37,17 @@ export default defineConfig({
       },
     },
   },
-  // sourcemap: process.env.NODE_ENV !== "production",
+  sourcemap: process.env.NODE_ENV !== "production",
   server: {
     port: 8000,
     open: true,
   },
   plugins: [
-    legacy({
-      targets: ["ie >= 11"],
-      additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
-    }),
+    // legacy({
+    //   targets: ["ie >= 11"],
+    //   additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
+    //   polyfills: false,
+    // }),
     viteImagemin({
       gifsicle: {
         optimizationLevel: 7,
