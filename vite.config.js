@@ -12,28 +12,33 @@ export default defineConfig({
     rollupOptions: {
       input: Object.fromEntries(
         glob
-          .sync("**/*.{js,scss}", {
+          .sync("**/*.{js,scss,html}", {
             ignore: "**/_**/**/*.{js,scss}",
-            cwd: `./src`,
+            cwd: root,
           })
           .map((file) => {
-            console.log(file);
-            const { dir, name } = path.parse(file);
-            return [`${dir}/${name}`, path.resolve("src", file)];
+            const { dir, name, ext } = path.parse(file);
+            if (ext === ".html") {
+              const rename = dir === "" ? name : dir;
+              console.log([rename, path.resolve(root, file)]);
+              return [`${name}`, path.resolve(root, file)];
+            }
+            return [`${dir}/${name}`, path.resolve(root, file)];
           })
       ),
       output: {
-        assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split(".")[1];
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = "images";
-          } else if (/woff|woff2|s?css/.test(extType)) {
-            extType = "css";
-          }
-          return `assets/${extType}/[name][extname]`;
-        },
-        chunkFileNames: "assets/js/[name].js",
-        entryFileNames: "assets/js/[name].js",
+        // assetFileNames: (assetInfo) => {
+        //   let extType = assetInfo.name.split(".")[1];
+        //   if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+        //     extType = "images";
+        //   } else if (/woff|woff2|s?css/.test(extType)) {
+        //     extType = "css";
+        //   }
+        //   return `assets/${extType}/[name][extname]`;
+        // },
+        assetFileNames: "[name][extname]",
+        // chunkFileNames: "assets/js/[name].js",
+        entryFileNames: "[name].js",
       },
     },
   },
