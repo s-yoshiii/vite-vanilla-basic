@@ -10,34 +10,37 @@ export default defineConfig({
     outDir: "../dist",
     emptyOutDir: true,
     rollupOptions: {
-      input: Object.fromEntries(
-        glob
-          .sync("**/*.{js,scss,html}", {
-            ignore: "**/_**/**/*.{js,scss}",
-            cwd: root,
-          })
-          .map((file) => {
-            const { dir, name, ext } = path.parse(file);
-            if (ext === ".html") {
-              const rename = dir === "" ? name : dir;
-              console.log([rename, path.resolve(root, file)]);
-              return [`${name}`, path.resolve(root, file)];
-            }
-            return [`${dir}/${name}`, path.resolve(root, file)];
-          })
-      ),
+      // JS,CSSのみコンパイルする場合
+      // input: Object.fromEntries(
+      //   glob
+      //     .sync("**/*.{js,scss}", {
+      //       ignore: "**/_**/**/*.{js,scss}",
+      //       cwd: root,
+      //     })
+      //     .map((file) => {
+      //       const { dir, name, ext } = path.parse(file);
+      //       return [`${dir}/${name}`, path.resolve(root, file)];
+      //     })
+      // ),
+      // HTMLベースに考える場合
+      input: {
+        index: path.resolve(__dirname, root, "index.html"),
+        page: path.resolve(__dirname, root, "page/index.html"),
+      },
       output: {
-        // assetFileNames: (assetInfo) => {
-        //   let extType = assetInfo.name.split(".")[1];
-        //   if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-        //     extType = "images";
-        //   } else if (/woff|woff2|s?css/.test(extType)) {
-        //     extType = "css";
-        //   }
-        //   return `assets/${extType}/[name][extname]`;
-        // },
-        assetFileNames: "[name][extname]",
-        // chunkFileNames: "assets/js/[name].js",
+        // JS,CSSのみコンパイルする場合
+        // assetFileNames: "[name][extname]",
+        // HTMLベースに考える場合
+        assetFileNames: (assetInfo) => {
+          let extType = assetInfo.name.split(".")[1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = "images";
+          } else if (/woff|woff2|s?css/.test(extType)) {
+            extType = "css";
+          }
+          return `assets/${extType}/[name][extname]`;
+        },
+        chunkFileNames: "assets/js/[name].js",
         entryFileNames: "[name].js",
       },
     },
