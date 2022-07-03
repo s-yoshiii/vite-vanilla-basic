@@ -6,6 +6,7 @@ const root = "src";
 export default defineConfig({
   root: root,
   base: "/",
+  publicDir: path.resolve(__dirname, "public"),
   build: {
     outDir: "../dist",
     emptyOutDir: true,
