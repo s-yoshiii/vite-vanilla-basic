@@ -1,15 +1,17 @@
-import { defineConfig } from "vite";
-import glob from "glob";
-import path from "path";
-import viteImagemin from "vite-plugin-imagemin";
-const root = "src";
+import { defineConfig } from 'vite';
+import glob from 'glob';
+import path from 'path';
+import viteImagemin from 'vite-plugin-imagemin';
+import handlebars from 'vite-plugin-handlebars';
+const root = 'src';
 export default defineConfig({
   root: root,
-  base: "/",
-  publicDir: path.resolve(__dirname, "public"),
+  base: '/',
+  publicDir: path.resolve(__dirname, 'public'),
   build: {
-    outDir: "../dist",
+    outDir: '../dist',
     emptyOutDir: true,
+    minify: false,
     rollupOptions: {
       // JS,CSSのみコンパイルする場合
       // input: Object.fromEntries(
@@ -24,29 +26,29 @@ export default defineConfig({
       //     })
       // ),
       // HTMLベースに考える場合
-      input: {
-        index: path.resolve(__dirname, root, "index.html"),
-        page: path.resolve(__dirname, root, "page/index.html"),
-      },
       output: {
         // JS,CSSのみコンパイルする場合
         // assetFileNames: "[name][extname]",
         // HTMLベースに考える場合
         assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split(".")[1];
+          let extType = assetInfo.name.split('.')[1];
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = "images";
+            extType = 'images';
           } else if (/woff|woff2|s?css/.test(extType)) {
-            extType = "css";
+            extType = 'css';
           }
           return `assets/${extType}/[name][extname]`;
         },
-        chunkFileNames: "assets/js/[name].js",
-        entryFileNames: "[name].js",
+        chunkFileNames: 'assets/js/[name].js',
+        entryFileNames: '[name].js',
+      },
+      input: {
+        index: path.resolve(__dirname, root, 'index.html'),
+        page: path.resolve(__dirname, root, 'page/index.html'),
       },
     },
   },
-  sourcemap: process.env.NODE_ENV !== "production",
+  sourcemap: process.env.NODE_ENV !== 'production',
   server: {
     port: 8000,
     open: true,
@@ -57,6 +59,12 @@ export default defineConfig({
     //   additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
     //   polyfills: false,
     // }),
+    handlebars({
+      partialDirectory: path.resolve(__dirname, './src/include'),
+      // context(pagePath) {
+      //   return pageData[pagePath];
+      // },
+    }),
     viteImagemin({
       gifsicle: {
         optimizationLevel: 7,
@@ -75,21 +83,14 @@ export default defineConfig({
       svgo: {
         plugins: [
           {
-            name: "removeViewBox",
+            name: 'removeViewBox',
           },
           {
-            name: "removeEmptyAttrs",
+            name: 'removeEmptyAttrs',
             active: false,
           },
         ],
       },
     }),
   ],
-  // css: {
-  //   preprocessorOptions: {
-  //     scss: {
-  //       additionalData: `$injectedColor: orange;`,
-  //     },
-  //   },
-  // },
 });
